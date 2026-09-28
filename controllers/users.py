@@ -3,12 +3,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.user import UserModel
-from serializers.user import UserSchema, UserRegistrationSchema
+from serializers.user import UserSchema, UserRegistrationSchema, UserLoginSchema, UserTokenSchema
 from database import get_db
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserSchema, status_code=201)
+@router.post("/register", response_model=UserTokenSchema, status_code=201)
 def create_user(user: UserRegistrationSchema, db: Session = Depends(get_db)):
     # Check if the username or email already exists
     existing_user = db.query(UserModel).filter(
@@ -27,4 +27,24 @@ def create_user(user: UserRegistrationSchema, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return new_user
+    # Generate JWT token
+    token = new_user.generate_token()
+
+        # Return token and a success message
+    return {"token": token, "message": "Login successful"}
+
+@router.post("/login", response_model=UserTokenSchema, status_code=201)
+def login(user: UserLoginSchema, db: Session = Depends(get_db)):
+
+    # Find the user by username
+    db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
+
+    # Check if the user exists and if the password is correct
+    if not db_user or not db_user.verify_password(user.password):
+        raise HTTPException(status_code=409, detail="Invalid username or password")
+
+    # Generate JWT token
+    token = db_user.generate_token()
+
+    # Return token and a success message
+    return {"token": token, "message": "Login successful"}
