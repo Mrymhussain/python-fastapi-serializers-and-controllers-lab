@@ -11,6 +11,10 @@ from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
 
+# Dependencies
+from dependencies.get_current_user import get_current_user
+
+
 router = APIRouter()
 
 @router.get('/teas', response_model=List[TeaSchema])
