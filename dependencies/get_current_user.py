@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from models.user import UserModel
 from database import get_db
 import jwt
-from jwt import DecodeError, ExpiredSignatureError # We import specific exceptions to handle them explicitly
+from jwt import DecodeError, ExpiredSignatureError  # We import specific exceptions to handle them explicitly
+from jwt.exceptions import InvalidSubjectError
 from config.environment import JWT_SECRET
 
 # FastAPI helper to extract the tokent from the auth headers : "Bearer ...."
@@ -31,6 +32,9 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(http_be
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                         detail='Token has expired')
 
+  except InvalidSubjectError:
+     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='Token invalid')
   return user
 
 

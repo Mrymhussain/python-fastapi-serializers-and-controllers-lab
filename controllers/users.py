@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from models.user import UserModel
 from serializers.user import UserSchema, UserRegistrationSchema, UserLoginSchema, UserTokenSchema
 from database import get_db
-from dependecies import get_current_user
+from dependencies.get_current_user import get_current_user
 
 router = APIRouter()
 
@@ -50,6 +50,6 @@ def login(user: UserLoginSchema, db: Session = Depends(get_db)):
     # Return token and a success message
     return {"token": token, "message": "Login successful"}
 
-# @router.get('/current_user', response_model=UserSchema)
-# def current_user(user: UserSchema = Depends(get_current_user)):
-#     return user
+@router.get('/current_user', response_model=UserSchema)
+def current_user(user: UserSchema = Depends(get_current_user)):
+    return user
