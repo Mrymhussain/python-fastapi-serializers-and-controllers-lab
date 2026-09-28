@@ -14,6 +14,7 @@ class UserLoginSchema(BaseModel):
 
 # Response Schemas
 class UserSchema(BaseModel):
+    id: int
     username: str
     email: str
 
