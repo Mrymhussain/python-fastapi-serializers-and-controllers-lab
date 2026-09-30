@@ -12,10 +12,13 @@ from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
 
-router = APIRouter()
+router = APIRouter(tags=["Tea Managment"])
 
 @router.get("/teas/{tea_id}/comments", response_model=List[CommentSchema])
 def get_comments_for_tea(tea_id: int, db: Session = Depends(get_db)):
+    """
+    This lists out all the comments that belong to a specific tea
+    """
     tea = db.query(TeaModel).filter(TeaModel.id == tea_id).first()
     if not tea:
         raise HTTPException(status_code=404, detail="Tea not found")

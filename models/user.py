@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from passlib.context import CryptContext
@@ -16,6 +16,7 @@ class UserModel(BaseModel):
     username = Column(String, unique=True)  # Each username must be unique
     email = Column(String, unique=True)  # Each email must be unique
     password = Column(String, nullable=True)
+    role = Column(String, nullable=False, default="user")
 
     # relationships
     teas = relationship("TeaModel", back_populates="user")
@@ -32,6 +33,8 @@ class UserModel(BaseModel):
         "exp": datetime.now(timezone.utc) + timedelta(days=1),  # Expiration time (1 day)
         "iat": datetime.now(timezone.utc),  # Issued at time
         "sub": str(self.id),  # Subject - the user ID
+        "is_admin": self.role == "admin",
+        "username": self.username
         }
 
         token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
